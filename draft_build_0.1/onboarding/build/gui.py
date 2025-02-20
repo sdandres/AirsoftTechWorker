@@ -131,15 +131,6 @@ button_6.place(
     height=100.0
 )
 
-canvas.create_text(
-    952.0,
-    612.0,
-    anchor="nw",
-    text="*Required Fields",
-    fill="#E00000",
-    font=("MergeOne Regular", 24 * -1)
-)
-
 button_image_7 = PhotoImage(
     file=relative_to_assets("button_7.png"))
 button_7 = Button(
@@ -173,6 +164,15 @@ button_8.place(
 )
 
 canvas.create_text(
+    952.0,
+    612.0,
+    anchor="nw",
+    text="*Required Fields",
+    fill="#E00000",
+    font=("MergeOne Regular", 24 * -1)
+)
+
+canvas.create_text(
     96.0,
     169.0,
     anchor="nw",
@@ -190,77 +190,185 @@ canvas.create_text(
     font=("MergeOne Regular", 24 * -1)
 )
 
-canvas.create_rectangle(
-    97.0,
-    204.0,
-    523.0,
-    251.0,
-    fill="#D9D9D9",
-    outline="")
-
-canvas.create_rectangle(
-    767.0,
-    538.0,
-    1039.0,
-    585.0,
-    fill="#D9D9D9",
-    outline="")
-
-canvas.create_rectangle(
-    613.0,
-    538.0,
-    720.0,
-    585.0,
-    fill="#D9D9D9",
-    outline="")
-
-canvas.create_rectangle(
-    97.0,
-    538.0,
-    523.0,
-    585.0,
-    fill="#D9D9D9",
-    outline="")
-
-canvas.create_rectangle(
-    613.0,
-    424.0,
-    1039.0,
-    471.0,
-    fill="#D9D9D9",
-    outline="")
-
-canvas.create_rectangle(
-    97.0,
-    424.0,
-    523.0,
-    471.0,
-    fill="#D9D9D9",
-    outline="")
-
-canvas.create_rectangle(
-    613.0,
+entry_image_1 = PhotoImage(
+    file=relative_to_assets("entry_1.png"))
+entry_bg_1 = canvas.create_image(
     310.0,
-    1039.0,
-    357.0,
-    fill="#D9D9D9",
-    outline="")
+    227.5,
+    image=entry_image_1
+)
+entry_1 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_1.place(
+    x=97.0,
+    y=204.0,
+    width=426.0,
+    height=45.0
+)
 
-canvas.create_rectangle(
-    613.0,
-    204.0,
-    1039.0,
-    251.0,
-    fill="#D9D9D9",
-    outline="")
+entry_image_2 = PhotoImage(
+    file=relative_to_assets("entry_2.png"))
+entry_bg_2 = canvas.create_image(
+    903.0,
+    561.5,
+    image=entry_image_2
+)
+entry_2 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_2.place(
+    x=767.0,
+    y=538.0,
+    width=272.0,
+    height=45.0
+)
 
-canvas.create_rectangle(
-    96.0,
+entry_image_3 = PhotoImage(
+    file=relative_to_assets("entry_3.png"))
+entry_bg_3 = canvas.create_image(
+    666.5,
+    561.5,
+    image=entry_image_3
+)
+entry_3 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_3.place(
+    x=613.0,
+    y=538.0,
+    width=107.0,
+    height=45.0
+)
+
+entry_image_4 = PhotoImage(
+    file=relative_to_assets("entry_4.png"))
+entry_bg_4 = canvas.create_image(
     310.0,
-    522.0,
-    357.0,
-    fill="#D9D9D9",
-    outline="")
+    561.5,
+    image=entry_image_4
+)
+entry_4 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_4.place(
+    x=97.0,
+    y=538.0,
+    width=426.0,
+    height=45.0
+)
+
+entry_image_5 = PhotoImage(
+    file=relative_to_assets("entry_5.png"))
+entry_bg_5 = canvas.create_image(
+    826.0,
+    447.5,
+    image=entry_image_5
+)
+entry_5 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_5.place(
+    x=613.0,
+    y=424.0,
+    width=426.0,
+    height=45.0
+)
+
+entry_image_6 = PhotoImage(
+    file=relative_to_assets("entry_6.png"))
+entry_bg_6 = canvas.create_image(
+    310.0,
+    447.5,
+    image=entry_image_6
+)
+entry_6 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_6.place(
+    x=97.0,
+    y=424.0,
+    width=426.0,
+    height=45.0
+)
+
+entry_image_7 = PhotoImage(
+    file=relative_to_assets("entry_7.png"))
+entry_bg_7 = canvas.create_image(
+    826.0,
+    333.5,
+    image=entry_image_7
+)
+entry_7 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_7.place(
+    x=613.0,
+    y=310.0,
+    width=426.0,
+    height=45.0
+)
+
+entry_image_8 = PhotoImage(
+    file=relative_to_assets("entry_8.png"))
+entry_bg_8 = canvas.create_image(
+    826.0,
+    227.5,
+    image=entry_image_8
+)
+entry_8 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_8.place(
+    x=613.0,
+    y=204.0,
+    width=426.0,
+    height=45.0
+)
+
+entry_image_9 = PhotoImage(
+    file=relative_to_assets("entry_9.png"))
+entry_bg_9 = canvas.create_image(
+    309.0,
+    333.5,
+    image=entry_image_9
+)
+entry_9 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    fg="#000716",
+    highlightthickness=0
+)
+entry_9.place(
+    x=96.0,
+    y=310.0,
+    width=426.0,
+    height=45.0
+)
 
 canvas.create_text(
     96.0,
