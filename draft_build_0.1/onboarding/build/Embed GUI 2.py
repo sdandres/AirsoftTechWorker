@@ -266,8 +266,15 @@ def validate_data():
         return False
 
     # State (from combobox)
-    if not state_combobox.get().strip():
+    state = state_combobox.get().strip()
+
+    if not state:
         messagebox.showerror("Invalid Input", "Please select a state.")
+        return False
+
+    # Check if state is exactly two uppercase letters
+    if len(state) != 2 or not state.isupper():
+        messagebox.showerror("Invalid Input", "State must have two uppercase letters.")
         return False
 
     # Zipcode
