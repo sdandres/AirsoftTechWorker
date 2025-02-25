@@ -31,7 +31,14 @@ canvas = Canvas(
 )
 canvas.place(x=0, y=0)
 
-# Example Buttons from Designer
+# Hover effect function
+def on_enter(event):
+    event.widget.config(borderwidth=2, relief="solid", highlightthickness=0, highlightbackground="blue")
+
+def on_leave(event):
+    event.widget.config(borderwidth=0, relief="flat", highlightthickness=0)
+
+#Buttons from Designer
 button_image_1 = PhotoImage(file=relative_to_assets("button_1.png"))
 button_1 = Button(
     window,
@@ -42,6 +49,8 @@ button_1 = Button(
     relief="flat"
 )
 button_1.place(x=0, y=0, width=200, height=100)
+button_1.bind("<Enter>", on_enter)  # Bind mouse enter
+button_1.bind("<Leave>", on_leave)  # Bind mouse leave
 
 button_image_2 = PhotoImage(file=relative_to_assets("button_2.png"))
 button_2 = Button(
@@ -52,6 +61,8 @@ button_2 = Button(
     relief="flat"
 )
 button_2.place(x=200.0, y=0.0, width=200.0, height=100.0)
+button_2.bind("<Enter>", on_enter)  # Bind mouse enter
+button_2.bind("<Leave>", on_leave)  # Bind mouse leave
 
 button_image_3 = PhotoImage(file=relative_to_assets("button_3.png"))
 button_3 = Button(
@@ -62,6 +73,8 @@ button_3 = Button(
     relief="flat"
 )
 button_3.place(x=400.0, y=0.0, width=200.0, height=100.0)
+button_3.bind("<Enter>", on_enter)  # Bind mouse enter
+button_3.bind("<Leave>", on_leave)  # Bind mouse leave
 
 button_image_4 = PhotoImage(file=relative_to_assets("button_4.png"))
 button_4 = Button(
@@ -72,6 +85,8 @@ button_4 = Button(
     relief="flat"
 )
 button_4.place(x=600.0, y=0.0, width=200.0, height=100.0)
+button_4.bind("<Enter>", on_enter)  # Bind mouse enter
+button_4.bind("<Leave>", on_leave)  # Bind mouse leave
 
 button_image_5 = PhotoImage(file=relative_to_assets("button_5.png"))
 button_5 = Button(
@@ -82,6 +97,8 @@ button_5 = Button(
     relief="flat"
 )
 button_5.place(x=800.0, y=0.0, width=200.0, height=100.0)
+button_5.bind("<Enter>", on_enter)  # Bind mouse enter
+button_5.bind("<Leave>", on_leave)  # Bind mouse leave
 
 button_image_6 = PhotoImage(file=relative_to_assets("button_6.png"))
 button_6 = Button(
@@ -92,6 +109,8 @@ button_6 = Button(
     relief="flat"
 )
 button_6.place(x=1000.0, y=0.0, width=200.0, height=100.0)
+button_6.bind("<Enter>", on_enter)  # Bind mouse enter
+button_6.bind("<Leave>", on_leave)  # Bind mouse leave
 
 # Texts that label each entry field:
 canvas.create_text(99.0, 169.0, anchor="nw", text="First Name*", fill="#000000", font=20)
@@ -312,6 +331,8 @@ save_button = tk.Button(
     command=save_data
 )
 save_button.place(x=1000, y=600, width=80, height=40)
+save_button.bind("<Enter>", on_enter)  # Bind mouse enter
+save_button.bind("<Leave>", on_leave)  # Bind mouse leave
 
 clear_button = tk.Button(
     window,
@@ -320,6 +341,8 @@ clear_button = tk.Button(
     command=clear_form
 )
 clear_button.place(x=900, y=600, width=80, height=40)
+clear_button.bind("<Enter>", on_enter)  # Bind mouse enter
+clear_button.bind("<Leave>", on_leave)  # Bind mouse leave
 
 window.resizable(False, False)
 window.mainloop()
