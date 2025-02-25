@@ -7,7 +7,7 @@ from pathlib import Path
 
 # from tkinter import *
 # Explicit imports to satisfy Flake8
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 
 
 OUTPUT_PATH = Path(__file__).parent
@@ -17,6 +17,17 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\hallo\OneDrive\Desktop\SP2025 DOCS\M
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
+def validate_login():
+    username = entry_2.get().strip()
+    password = entry_1.get().strip()
+    print(f"Username entered: '{username}'")
+    print(f"Password entered: '{password}'")
+    if username == "admin" and password == "password":
+        messagebox.showinfo("Login Successful", "Welcome!")
+        from main_menu import gui.py
+        
+    else:
+        messagebox.showerror("Invalid Credentials", "Incorrect username or password.")
 
 window = Tk()
 
