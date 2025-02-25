@@ -2,7 +2,7 @@ import csv
 
 def search_inventory(entry_widget, output_widget):
     """
-    Search for an item in the inventory CSV and display results in the output widget.
+    Search for an item in the inventory CSV and display results vertically in the output widget.
     
     Parameters:
         entry_widget: The Tkinter Entry widget where the user types the item name.
@@ -29,17 +29,16 @@ def search_inventory(entry_widget, output_widget):
             reader = csv.DictReader(file)
             for row in reader:
                 if row[description_key].lower() == item_name:
-                    # Format the result (edit this format if you want a different layout)
-                    result = (f"Item Description: {row[description_key]}\n"
-                              f"Location: {row[location_key]}\n"
-                              f"Reorder Level: {row[reorder_key]}\n"
-                              f"Quantity: {row[quantity_key]}\n"
-                              f"SKU Number: {row[sku_key]}")
-                    output_widget.insert("end", result)
+                    # List items vertically, one per line
+                    output_widget.insert("end", f"Item Description: {row[description_key]}\n")
+                    output_widget.insert("end", f"Location: {row[location_key]}\n")
+                    output_widget.insert("end", f"Reorder Level: {row[reorder_key]}\n")
+                    output_widget.insert("end", f"Quantity: {row[quantity_key]}\n")
+                    output_widget.insert("end", f"SKU Number: {row[sku_key]}\n")
                     return  # Stop once found
             # If not found
-            output_widget.insert("end", "Error: Item not found in inventory.")
+            output_widget.insert("end", "Error: Item not found in inventory.\n")
     except FileNotFoundError:
-        output_widget.insert("end", f"Error: Could not find {csv_file}.")
+        output_widget.insert("end", f"Error: Could not find {csv_file}.\n")
     except Exception as e:
-        output_widget.insert("end", f"Error: {str(e)}")
+        output_widget.insert("end", f"Error: {str(e)}\n")
