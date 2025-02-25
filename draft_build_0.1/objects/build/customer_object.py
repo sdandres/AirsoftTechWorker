@@ -25,6 +25,6 @@ class customer_object:
             "Zipcode": self.zipcode
         }
 
-def save_data(self, customer_object):
-    df = pd.DataFrame([self.to_dict()])
-    df.to_csv('customer_data.csv', mode='a', index=False, encoding='utf-8', header=not pd.io.common.file_exists('customer_data.csv'))
+    def save_data(self, customer_object):
+        df = pd.DataFrame([self.to_dict()])
+        df.to_csv('customer_data.csv', mode='a', index=False, encoding='utf-8', header=not pd.io.common.file_exists('customer_data.csv'))
