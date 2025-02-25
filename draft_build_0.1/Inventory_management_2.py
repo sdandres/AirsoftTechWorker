@@ -1,4 +1,6 @@
 import csv
+import tkinter as tk
+from tkinter import ttk
 
 def search_inventory(entry_widget, output_widget):
     """
@@ -29,14 +31,14 @@ def search_inventory(entry_widget, output_widget):
             reader = csv.DictReader(file)
             for row in reader:
                 if row[description_key].lower() == item_name:
-                    # List items vertically, one per line
+                    # List items vertically, one per line in the output widget
                     output_widget.insert("end", f"Item Description: {row[description_key]}\n")
                     output_widget.insert("end", f"Location: {row[location_key]}\n")
                     output_widget.insert("end", f"Reorder Level: {row[reorder_key]}\n")
                     output_widget.insert("end", f"Quantity: {row[quantity_key]}\n")
                     output_widget.insert("end", f"SKU Number: {row[sku_key]}\n")
                     return  # Stop once found
-            # If not found
+            # If not found, show error vertically
             output_widget.insert("end", "Error: Item not found in inventory.\n")
     except FileNotFoundError:
         output_widget.insert("end", f"Error: Could not find {csv_file}.\n")
