@@ -1,9 +1,7 @@
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, messagebox
 import gui.gui as gui
 
-def validate_login(window):
-    username = window.entry_2.get().strip()
-    password = window.entry_1.get().strip()
+def validate_login(window, username, password):
     print(f"Username entered: '{username}'")
     print(f"Password entered: '{password}'")
     if username == "" and password == "":
