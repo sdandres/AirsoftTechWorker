@@ -2,8 +2,9 @@ import pyodbc
 from utils.path_utils import get_database_conn_str
 from utils.onboarding_utils import read_customer_data_from_access
 from utils.new_ticket_utils import format_customer_data
+from datetime import datetime
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, END
 
 # Labor price dictionary
 labor_prices = {
@@ -15,6 +16,129 @@ labor_prices = {
     "Connector Swap": "19",
     "Custom": ""  # Blank for manual input
 }
+
+def save_changes(ticket, gun_entries, technician_entry, labor_selection, price_entry, parts_tree, subtotal_label, tax_entry, total_label, dropoff_entry, finish_entry, pickup_entry, status_dropdown):
+    """Save updates to gun info, labor info, status dates, and parts for the given ticket to the database.
+       Date fields are converted to datetime objects and part quantity/prices are converted to numbers."""
+    
+    # Define expected date format (MM/DD/YYYY)
+    date_format = "%m/%d/%Y"
+
+    # Helper function to safely parse dates
+    def parse_date(date_str):
+        if date_str and date_str.lower() != "none":
+            try:
+                return datetime.strptime(date_str, date_format)
+            except Exception as e:
+                print(f"Warning: Could not parse date '{date_str}': {e}")
+        return None
+
+    # Gather updated gun info from GUI fields
+    gun_brand = gun_entries["Gun Brand"].get().strip()
+    gun_model = gun_entries["Gun Model"].get().strip()
+    purchase_location = gun_entries["Purchase Location"].get().strip()
+    purchase_date_str = gun_entries["Purchase Date"].get().strip()
+    past_info = gun_entries["Past Info"].get("1.0", END).strip()
+    work_desc = gun_entries["Work Description"].get("1.0", END).strip()
+    additional_parts = gun_entries["Additional Parts"].get("1.0", END).strip()
+    additional_comments = gun_entries["Additional Comments"].get("1.0", END).strip()
+    employee = gun_entries["Employee"].get().strip()
+
+    # Convert date strings to datetime objects using the helper function
+    purchase_date = parse_date(purchase_date_str)
+    dropoff_date = parse_date(dropoff_entry.get().strip())
+    finish_date = parse_date(finish_entry.get().strip())
+    pickup_date = parse_date(pickup_entry.get().strip())
+
+    # Get labor-related values
+    technician = technician_entry.get().strip()
+    labor_type = labor_selection.get()
+    labor_price_str = price_entry.get().strip()
+    
+    labor_price_val = None
+    if labor_price_str:
+        try:
+            labor_price_val = float(labor_price_str)
+        except ValueError:
+            labor_price_val = None
+
+    # For "Did not specify", set labor type to None
+    labor_type_val = None if labor_type == "Did not specify" else labor_type
+    if labor_type == "Did not specify" or labor_price_str == "":
+        labor_price_val = None
+
+    # Get current status
+    status = status_dropdown.get()
+
+    # Ensure LaborID and GunID are integers
+    try:
+        labor_id = int(ticket["LaborID"])
+        gun_id = int(ticket["GunID"])
+    except Exception as e:
+        messagebox.showerror("Data Error", f"Invalid ticket ID: {e}")
+        return
+
+    conn = None
+    cursor = None
+    try:
+        conn = pyodbc.connect(get_database_conn_str())
+        cursor = conn.cursor()
+
+        # Update the Guns table with gun-related fields
+        update_gun_query = """
+            UPDATE Guns
+            SET GunBrand = ?, GunModel = ?, PurchaseLocation = ?, PurchaseDate = ?, DropOffDate = ?, PickUpDate = ?, PastInfo = ?
+            WHERE GunID = ?
+        """
+        cursor.execute(update_gun_query,
+                       gun_brand, gun_model, purchase_location,
+                       purchase_date,   # datetime object or None
+                       dropoff_date, pickup_date, past_info,
+                       gun_id)
+
+        # Update the Labor table with labor-related fields and status
+        update_labor_query = """
+            UPDATE Labor
+            SET Employee = ?, WorkDescription = ?, AdditionalComments = ?, AdditionalParts = ?, Technician = ?, LaborType = ?, LaborPrice = ?, LaborStatus = ?, CompleteDate = ?
+            WHERE LaborID = ?
+        """
+        cursor.execute(update_labor_query,
+                       employee, work_desc, additional_comments, additional_parts,
+                       technician, labor_type_val, labor_price_val,
+                       status, finish_date, labor_id)
+
+        # Refresh the Parts list: delete existing parts for this LaborID and insert current ones from the TreeView
+        delete_parts_query = "DELETE FROM Parts WHERE LaborID = ?"
+        cursor.execute(delete_parts_query, labor_id)
+
+        insert_part_query = "INSERT INTO Parts (LaborID, PartName, PartQuantity, PartPrice) VALUES (?, ?, ?, ?)"
+        for item in parts_tree.get_children():
+            part_name, part_qty, part_price_str = parts_tree.item(item, "values")
+            # Convert part quantity to integer
+            try:
+                part_qty_val = int(part_qty)
+            except ValueError:
+                part_qty_val = 0
+            # Remove any leading '$' and convert part price to float
+            try:
+                part_price_val = float(part_price_str.replace("$", ""))
+            except ValueError:
+                part_price_val = 0.0
+            cursor.execute(insert_part_query, labor_id, part_name, part_qty_val, part_price_val)
+
+        # Commit the transaction
+        conn.commit()
+        messagebox.showinfo("Success", "Changes saved successfully.")
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        messagebox.showerror("Database Error", f"Error saving changes: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 def update_totals(price_entry, parts_tree, subtotal_label, tax_entry, total_label):
     """Calculates and updates subtotal, tax, and total amount dynamically."""
@@ -66,32 +190,45 @@ def read_ticket_data_from_access():
         # Query to select all columns from Guns (Tickets) and Customer
         query = """
         SELECT 
-            g.[OrderID] AS TicketID, 
-            g.[DropOffDate], 
-            g.[CustomerID], 
-            g.[Employee], 
-            g.[GunBrand], 
-            g.[GunModel], 
-            g.[SerialNum], 
-            g.[PurchaseLocation], 
-            g.[PurchaseDate], 
-            g.[PastInfo], 
-            g.[WorkDescription], 
-            g.[AdditionalParts], 
-            g.[AdditionalComments], 
-            c.[CustomerID] AS CustID, 
-            c.[FirstName], 
-            c.[LastName], 
-            c.[Email], 
-            c.[Mobile] AS PhoneNumber, 
-            c.[Address], 
-            c.[Address2], 
-            c.[City], 
-            c.[State], 
-            c.[Zipcode]
-        FROM Guns AS g
-        LEFT JOIN Customer AS c ON g.[CustomerID] = c.[CustomerID];
+            [l].[LaborID], 
+            [l].[GunID], 
+            [l].[Employee], 
+            [l].[WorkDescription], 
+            [l].[AdditionalComments], 
+            [l].[AdditionalParts], 
+            [l].[Technician], 
+            [l].[LaborType], 
+            [l].[LaborPrice], 
+            [l].[LaborStatus], 
+            [l].[CompleteDate],
+
+            [g].[GunID] AS [GunRefID], 
+            [g].[CustomerID], 
+            [g].[DropOffDate], 
+            [g].[GunBrand], 
+            [g].[GunModel], 
+            [g].[SerialNum], 
+            [g].[PurchaseLocation], 
+            [g].[PurchaseDate], 
+            [g].[PastInfo], 
+            [g].[PickUpDate],
+
+            [c].[CustomerID] AS [CustID], 
+            [c].[FirstName], 
+            [c].[LastName], 
+            [c].[Email], 
+            [c].[Mobile] AS [PhoneNumber], 
+            [c].[Address], 
+            [c].[Address2], 
+            [c].[City], 
+            [c].[State], 
+            [c].[Zipcode]
+
+        FROM ([Labor] AS [l]
+        LEFT JOIN [Guns] AS [g] ON [l].[GunID] = [g].[GunID])
+        LEFT JOIN [Customer] AS [c] ON [g].[CustomerID] = [c].[CustomerID];
         """
+
         
         cursor.execute(query)
 
@@ -110,6 +247,36 @@ def read_ticket_data_from_access():
     except Exception as e:
         messagebox.showerror("Database Error", f"Error retrieving tickets: {e}")
         return []
+    
+def read_part_list_from_access(ticket):
+    parts_list = []
+    try:
+        conn = pyodbc.connect(get_database_conn_str())
+        cursor = conn.cursor()
+
+        # Query to select all columns from Guns (Tickets) and Customer
+        query = """
+            SELECT PartName, PartQuantity, PartPrice
+            FROM Parts
+            WHERE LaborID = ?
+        """
+
+        cursor.execute(query, ticket['LaborID'])
+        rows = cursor.fetchall()
+
+        for row in rows:
+            parts_list.append({
+                "PartName": row.PartName,
+                "PartQuantity": row.PartQuantity,
+                "PartPrice": row.PartPrice
+            })
+
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"Error retrieving parts for LaborID {ticket['LaborID']}: {e}")
+
+    return parts_list
 
 def create_customer_section(parent_frame, ticket):
     """Creates the customer details section (Read-Only)."""
@@ -177,7 +344,7 @@ def create_gun_section(parent_frame, ticket):
 
     return gun_frame, entry_widgets
 
-def create_labor_section(parent_frame):
+def create_labor_section(parent_frame, ticket):
     """Creates the labor section with technician entry and labor pricing, keeping labels and fields inline."""
     labor_frame = tk.Frame(parent_frame, padx=10, pady=10)
     labor_frame.pack(fill="x", padx=5, pady=5)
@@ -191,13 +358,19 @@ def create_labor_section(parent_frame):
     technician_entry = tk.Entry(row_frame1, width=30)
     technician_entry.pack(side="left")
 
+    if ticket['Technician'] != None and ticket['Technician'] != "":
+        technician_entry.insert(ticket['Technician'])
+
     # Labor Type Dropdown (Single Row)
     row_frame2 = tk.Frame(labor_frame)
     row_frame2.pack(fill="x", padx=5, pady=3)
     tk.Label(row_frame2, text="Labor Type", width=12, anchor="w").pack(side="left")
 
     labor_selection = ttk.Combobox(row_frame2, values=list(labor_prices.keys()), state="readonly", width=28)
-    labor_selection.set("Did not specify")
+    if ticket['LaborPrice'] == None:
+        labor_selection.set("Did not specify")
+    else:
+        labor_selection.set(ticket['LaborPrice'])
     labor_selection.pack(side="left")
 
     # Labor Price Entry (Single Row)
@@ -207,9 +380,25 @@ def create_labor_section(parent_frame):
     price_entry = tk.Entry(row_frame3, width=10)
     price_entry.pack(side="left")
 
+    if ticket['LaborPrice'] != None:
+        technician_entry.insert(ticket['LaborPrice'])
+
     return labor_frame, technician_entry, labor_selection, price_entry
 
-def create_parts_section(parent_frame, price_entry, subtotal_label, tax_entry, total_label):
+def populate_parts_tree(tree, parts):
+    # Clear any existing rows
+    for item in tree.get_children():
+        tree.delete(item)
+
+    # Add new parts from the list
+    for part in parts:
+        tree.insert('', 'end', values=(
+            part["PartName"],
+            part["PartQuantity"],
+            f"${part['PartPrice']:.2f}"
+        ))
+
+def create_parts_section(parent_frame, price_entry, parts_list, ticket):
     """Creates the parts section with entry fields and a Treeview list."""
     parts_frame = tk.Frame(parent_frame, padx=10, pady=10)
     parts_frame.pack(fill="x", padx=5, pady=5)
@@ -235,7 +424,7 @@ def create_parts_section(parent_frame, price_entry, subtotal_label, tax_entry, t
 
     # Ensure we pass all required parameters when calling `add_part_to_tree`
     tk.Button(entry_frame, text="Add", command=lambda: add_part_to_tree(
-        part_name_entry, part_qty_entry, part_price_entry, parts_tree, price_entry, subtotal_label, tax_entry, total_label
+        part_name_entry, part_qty_entry, part_price_entry, parts_tree, price_entry
     )).pack(side="left", padx=5)
 
     # Treeview with scrollbar
@@ -257,9 +446,11 @@ def create_parts_section(parent_frame, price_entry, subtotal_label, tax_entry, t
     tree_scroll.pack(side="right", fill="y")
     tree_scroll.config(command=parts_tree.yview)
 
+    populate_parts_tree(parts_tree, parts_list)
+
     # Delete button for removing selected parts
     tk.Button(parts_frame, text="Delete Selected", command=lambda: delete_part_from_tree(
-        parts_tree, price_entry, subtotal_label, tax_entry, total_label
+        parts_tree, price_entry,
     )).pack(pady=5)
 
     return parts_frame, parts_tree
@@ -299,7 +490,19 @@ def create_date_section(parent_frame, ticket):
     dropoff_row.pack(fill="x", padx=5, pady=2)
     tk.Label(dropoff_row, text="Drop-Off Date", width=15, anchor="w").pack(side="left")
     dropoff_entry = tk.Entry(dropoff_row, width=30)
-    dropoff_entry.insert(0, ticket.get("DropOffDate", ""))  # Use ticket value or empty string
+    raw_date = ticket.get("DropOffDate")
+    if raw_date:
+        try:
+            # If it's already a datetime object
+            formatted_date = raw_date.strftime("%m/%d/%Y")
+        except AttributeError:
+            # If it's a string, parse and then format
+            parsed = datetime.strptime(raw_date, "%Y-%m-%d %H:%M:%S")
+            formatted_date = parsed.strftime("%m/%d/%Y")
+    else:
+        formatted_date = ""
+    
+    dropoff_entry.insert(0, formatted_date)  # Use ticket value or empty string
     dropoff_entry.pack(side="left")
 
     # Finish Date
@@ -323,27 +526,46 @@ def create_date_section(parent_frame, ticket):
 
     status_options = ["Pending", "Awaiting Parts", "Work in Progress", "Awaiting Pick Up", "Completed", "Canceled"]
     
-    status_var = tk.StringVar(value=ticket.get("Status", "Pending"))  # Default to "Pending" if not provided
-    status_dropdown = ttk.Combobox(status_row, values=status_options, textvariable=status_var, state="readonly", width=27)
+    status_var = ticket["LaborStatus"]
+    if status_var is None:
+        status_var = "Pending" # Default to "Pending" if not provided
+    status_dropdown = ttk.Combobox(status_row, values=status_options, state="readonly", width=27)
+    status_dropdown.set(status_var)
     status_dropdown.pack(side="left")
 
     return date_frame, dropoff_entry, finish_entry, pickup_entry, status_dropdown
 
-def create_buttons(parent_frame, ticket, gun_entries, technician_entry, labor_selection, price_entry, parts_tree, subtotal_label, tax_entry, total_label):
+def create_buttons(parent_frame, ticket, gun_entries, technician_entry, labor_selection, price_entry, parts_tree, subtotal_label, tax_entry, total_label, dropoff_entry, finish_entry, pickup_entry, status_dropdown):
     """Creates the print and save buttons and ensures they are positioned correctly in the right column."""
     
     tk.Button(parent_frame, text="Print Ticket", width=15).pack(side="left", padx=5)
     tk.Button(parent_frame, text="Print Invoice", width=15).pack(side="left", padx=5)
 
     save_button = tk.Button(parent_frame, text="Save Changes", width=20, height=2, font=("Arial", 10, "bold"),
-                            command=lambda: save_changes(ticket, gun_entries, technician_entry, labor_selection, price_entry, parts_tree, subtotal_label, tax_entry, total_label))
+                            command=lambda: save_changes(
+        ticket,
+        gun_entries,
+        technician_entry,
+        labor_selection,
+        price_entry,
+        parts_tree,
+        subtotal_label,
+        tax_entry,
+        total_label,
+        dropoff_entry,    # Date section field for drop-off date
+        finish_entry,     # Date section field for finish date
+        pickup_entry,     # Date section field for pick-up date
+        status_dropdown   # Status dropdown
+        ))
     save_button.pack(side="right", padx=5)
 
 def edit_ticket_window(ticket):
     """Main function that opens the ticket editing window and assembles all sections with a two-column layout."""
     
+    parts_list = read_part_list_from_access(ticket)
+
     edit_window = tk.Toplevel()
-    edit_window.title(f"Edit Ticket ID {ticket['TicketID']}")
+    edit_window.title(f"Edit Ticket ID {ticket['LaborID']}")
     edit_window.geometry("1000x800")  
     edit_window.resizable(False, False)
 
@@ -359,8 +581,8 @@ def edit_ticket_window(ticket):
     gun_frame, gun_entries = create_gun_section(left_column, ticket)  # Gun Data (Editable)
 
     # === RIGHT COLUMN (Labor, Parts, Totals, Dates, Buttons) ===
-    labor_frame, technician_entry, labor_selection, price_entry = create_labor_section(right_column)
-    parts_frame, parts_tree = create_parts_section(right_column, price_entry, subtotal_label=None, tax_entry=None, total_label=None)
+    labor_frame, technician_entry, labor_selection, price_entry = create_labor_section(right_column, ticket)
+    parts_frame, parts_tree = create_parts_section(right_column, price_entry, parts_list, ticket)
     
     # Totals Section
     total_frame, subtotal_label, tax_entry, total_label = create_total_section(right_column)
@@ -372,7 +594,7 @@ def edit_ticket_window(ticket):
     button_frame = tk.Frame(right_column, padx=10, pady=10)
     button_frame.pack(fill="x", padx=5, pady=5)
 
-    create_buttons(button_frame, ticket, gun_entries, technician_entry, labor_selection, price_entry, parts_tree, subtotal_label, tax_entry, total_label)
+    create_buttons(button_frame, ticket, gun_entries, technician_entry, labor_selection, price_entry, parts_tree, subtotal_label, tax_entry, total_label, dropoff_entry, finish_entry, pickup_entry, status_dropdown)
 
     edit_window.mainloop()
 

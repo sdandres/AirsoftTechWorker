@@ -1,6 +1,8 @@
-from tkinter import Tk, ttk, Canvas, Entry, Text, Button, PhotoImage, VERTICAL, Scrollbar, Label, Toplevel, END, StringVar
+from tkinter import Tk, ttk, Canvas, Entry, Text, Button, PhotoImage, VERTICAL, Scrollbar, Label, Toplevel, END, StringVar, messagebox
+from datetime import datetime
 
 import utils.login_page_utils as lp
+import utils.main_menu_utils as mm
 import utils.onboarding_utils as ob
 import utils.new_ticket_utils as nt
 import utils.customers_utils as cs
@@ -296,7 +298,7 @@ def open_tickets(window):
     # Populate Treeview with ticket data
     for ticket in tickets:
         tree.insert("", END, values=(
-            ticket["TicketID"],
+            ticket["LaborID"],
             ticket["FirstName"],
             ticket["LastName"],
             ticket["GunBrand"],
@@ -311,14 +313,14 @@ def open_tickets(window):
 
         # Filter and insert matching tickets
         for ticket in tickets:
-            if (search_term in str(ticket["TicketID"]).lower() or 
+            if (search_term in str(ticket["LaborID"]).lower() or 
                 search_term in ticket["FirstName"].lower() or  
                 search_term in ticket["LastName"].lower() or  
                 search_term in ticket["GunBrand"].lower() or  
                 search_term in ticket["GunModel"].lower() or  
                 search_term in ticket["SerialNum"].lower()):
                 tree.insert("", END, values=(
-                    ticket["TicketID"],
+                    ticket["LaborID"],
                     ticket["FirstName"],
                     ticket["LastName"],
                     ticket["GunBrand"],
@@ -334,7 +336,7 @@ def open_tickets(window):
 
             # Pass full ticket details to edit window
             for ticket in tickets:
-                if ticket["TicketID"] == item_values[0]:
+                if ticket["LaborID"] == item_values[0]:
                     ts.edit_ticket_window(ticket)
                     break
 
@@ -554,9 +556,9 @@ def open_customers(window):
                 }
                 show_customer_details(customer)
             else:
-                print("⚠️ No values found in selected item!")
+                print("No values found in selected item!")
         else:
-            print("⚠️ No selection detected!")
+            print("No selection detected!")
 
     update_list()
 
@@ -570,6 +572,50 @@ def open_customers(window):
 def open_new_ticket(window):
     window.geometry("1200x800")
     window.configure(bg = "#FFFFFF")
+
+    def no_digits(char):
+        return not char.isdigit()
+
+    def format_and_validate_date(event, date_entry):
+        if event.keysym == "BackSpace":
+            return
+
+        digits = [c for c in date_entry.get() if c.isdigit()]
+        new_text = ""
+
+        # Month (MM)
+        if len(digits) >= 1:
+            if int(digits[0]) > 1:
+                digits.insert(0, '0')
+        if len(digits) >= 2:
+            month = int(''.join(digits[0:2]))
+            month = min(max(month, 1), 12)
+            new_text += f"{month:02d}/"
+        elif len(digits) >= 1:
+            new_text += digits[0]
+
+        # Day (DD)
+        if len(digits) >= 3:
+            if int(digits[2]) > 3:
+                digits.insert(2, '0')
+        if len(digits) >= 4:
+            day = int(''.join(digits[2:4]))
+            day = min(max(day, 1), 31)
+            new_text += f"{day:02d}/"
+        elif len(digits) >= 3:
+            new_text += digits[2]
+
+        # Year (YYYY starting with '2')
+        if len(digits) >= 5:
+            if digits[4] != '2':
+                digits[4] = '2'  # force first year digit to '2'
+        if len(digits) >= 5:
+            year_digits = digits[4:8]
+            new_text += ''.join(year_digits)
+
+        date_entry.delete(0, END)
+        date_entry.insert(0, new_text[:10]) # limit exactly to 10 chars MM/DD/YYYY
+
      # Step 1: Read raw customer data from ob (Contains CustomerID, FirstName, LastName)
     raw_customers = ob.read_customer_data_from_access()
 
@@ -760,6 +806,13 @@ def open_new_ticket(window):
         height=45.0
     )
 
+    window.drop_off_date_entry.insert(0, datetime.today().strftime("%m/%d/%Y"))
+
+    window.drop_off_date_entry.bind(
+        '<KeyRelease>',
+        lambda event: format_and_validate_date(event, date_entry=window.drop_off_date_entry)
+    )
+
     window.purchase_location_entry = Entry(
         bd=0,
         bg="#D9D9D9",
@@ -838,6 +891,11 @@ def open_new_ticket(window):
         height=45.0
     )
 
+    window.purchase_date_entry.bind(
+        '<KeyRelease>',
+        lambda event: format_and_validate_date(event, date_entry=window.purchase_date_entry)
+    )
+
     window.gun_serial_entry = Entry(
         bd=0,
         bg="#D9D9D9",
@@ -911,6 +969,20 @@ def open_new_ticket(window):
         height=45.0
     )
 
+    window.hidden_customer_id = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+
+    window.hidden_customer_id.place(
+        x=300.0,
+        y=155.0,
+        width=40,
+        height=20.0
+    )
+
     window.customer_combobox = ttk.Combobox(
         window,
         values=customer_names
@@ -928,7 +1000,10 @@ def open_new_ticket(window):
         # Find the matching customer in the dictionary
         for customer in customers:
             if customer["FullName"] == typed_name:
-                window.customer_combobox.set(customer["CustomerID"])  # Replace name with ID
+                window.customer_combobox.set(customer["FullName"])  # Replace name with ID
+                window.hidden_customer_id.delete(0, END)
+                window.hidden_customer_id.insert(0, customer["CustomerID"])
+
                 break
 
     def autocomplete(event):
@@ -1283,6 +1358,7 @@ def open_onboarding(window):
         width=107.0, 
         height=45.0
     )
+    window.state_combobox.set("CA")
 
     def autocomplete(event):
         entered_text = event.widget.get()
@@ -1555,7 +1631,7 @@ def open_main_menu(window):
         image=window.print_new_invoice_button_image,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: print("button_7 clicked"),
+        command=lambda: (clear_window(window),open_tickets(window)),
         relief="flat"
     )
     window.print_new_invoice_button.place(
@@ -1597,41 +1673,65 @@ def open_main_menu(window):
         height=111.0
     )
 
-    window.search_results_field = Text(
-        bd=0,
-        bg="#D0D0D0",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.search_results_field.place(
-        x=593.0,
-        y=255.0,
-        width=559.0,
-        height=386.0
-    )
-
     window.canvas.create_text(
         593.0,
         140.0,
         anchor="nw",
-        text="Search by name:",
+        text="Current Tickets:",
         fill="#000000",
         font=("MergeOne Regular", 24 * -1)
     )
 
+    # Scrollbar for the Treeview
+    scrollbar = Scrollbar(window, orient=VERTICAL)
 
-    window.search_bar_field = Entry(
-        bd=0,
-        bg="#D0D0D0",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.search_bar_field.place(
-        x=593.0,
-        y=170.0,
-        width=559.0,
-        height=48.0
-    )
+    # Define the columns to display active tickets
+    columns = ("LaborID", "FirstName", "LastName", "GunModel", "LaborStatus")
+    tree = ttk.Treeview(window, columns=columns, show="headings", height=10)
+
+    # Set column headings
+    tree.heading("LaborID", text="Ticket ID")
+    tree.heading("FirstName", text="First Name")
+    tree.heading("LastName", text="Last Name")
+    tree.heading("GunModel", text="Gun Model")
+    tree.heading("LaborStatus", text="Status")
+
+    # Set column widths and alignment
+    tree.column("LaborID", width=50, anchor="center")
+    tree.column("FirstName", width=50, anchor="center")
+    tree.column("LastName", width=50, anchor="center")
+    tree.column("GunModel", width=50, anchor="center")
+    tree.column("LaborStatus", width=50, anchor="center")
+
+    # Place the Treeview and scrollbar in the window
+    tree.place(x=593, y=190, width=500, height=430)
+    tree.configure(yscroll=scrollbar.set)
+    scrollbar.place(x=1093, y=190, height=430)
+
+    def update_active_tickets_list():
+        """Load active tickets from the database using the utility function."""
+        try:
+            # "LaborID", "FirstName", "LastName", "GunModel", and "LaborStatus"
+            active_tickets = mm.read_active_tickets_from_access()
+        except Exception as e:
+            messagebox.showerror("Database Error", f"Error loading active tickets: {e}")
+            active_tickets = []
+
+        # Clear any existing rows in the Treeview
+        tree.delete(*tree.get_children())
+        # Insert the active tickets into the Treeview
+        for ticket in active_tickets:
+            tree.insert("", END, values=(
+                ticket["LaborID"],
+                ticket["FirstName"],
+                ticket["LastName"],
+                ticket["GunModel"],
+                ticket["LaborStatus"]
+            ))
+
+    # Initially load active tickets into the treeview
+    update_active_tickets_list()
+
     window.resizable(False, False)
     window.mainloop()
 

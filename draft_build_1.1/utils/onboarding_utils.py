@@ -53,10 +53,6 @@ def validate_data(window):
     # State (from combobox)
     state = window.state_combobox.get().strip()
 
-    if not state:
-        messagebox.showerror("Invalid Input", "Please select a state.")
-        return False
-
     # Check if state is exactly two uppercase letters
     if len(state) != 2 or not state.isupper():
         messagebox.showerror("Invalid Input", "State must have two uppercase letters.")
@@ -110,7 +106,7 @@ def save_to_access(window):
         return  # Stop if validation fails
     
     try:
-        conn = pyodbc.connect(get_database_conn_str)
+        conn = pyodbc.connect(get_database_conn_str())
         cursor = conn.cursor()
 
 

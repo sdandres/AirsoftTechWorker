@@ -1,4 +1,5 @@
 from tkinter import END, messagebox
+from datetime import datetime
 from utils.path_utils import get_database_conn_str
 import pyodbc
 
@@ -38,27 +39,62 @@ def save_to_access(window):
         conn = pyodbc.connect(get_database_conn_str())
         cursor = conn.cursor()
 
-        # SQL Insert Query
-        query = """
-        INSERT INTO Guns (DropOffDate, CustomerID, Employee, GunBrand, GunModel, SerialNum, PurchaseLocation, PurchaseDate, PastInfo, WorkDescription, AdditionalParts, AdditionalComments)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        # Insert into Guns table
+        guns_insert_query = """
+        INSERT INTO Guns (CustomerID, DropOffDate, GunBrand, GunModel, SerialNum, PurchaseLocation, PurchaseDate, PastInfo, PickUpDate)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
+        print("into guns")
 
-        # Execute query
-        cursor.execute(query, (
-            window.drop_off_date_entry.get(),
-            window.customer_combobox.get(),
-            window.received_by_entry.get(),
+        def parse_optional_date(date_str):
+            date_str = date_str.strip()
+            if date_str == "":
+                return None
+            return datetime.strptime(date_str, "%m/%d/%Y").date()
+        guns_values = (
+            window.hidden_customer_id.get(),
+            datetime.strptime(window.drop_off_date_entry.get(), "%m/%d/%Y"),
             window.gun_brand_combobox.get(),
             window.gun_model_entry.get(),
             window.gun_serial_entry.get(),
             window.purchase_location_entry.get(),
-            window.purchase_date_entry.get(),
+            parse_optional_date(window.purchase_date_entry.get()),
             window.past_entry.get(),
+            None
+        )
+        print(guns_values)
+
+        print("guns q")
+        cursor.execute(guns_insert_query, guns_values)
+
+        print("guns c")
+        # Retrieve generated GunID
+        cursor.execute("SELECT @@IDENTITY")
+        gun_id = cursor.fetchone()[0]
+
+        # Insert into Labor table
+        labor_insert_query = """
+        INSERT INTO Labor (GunID, Employee, WorkDescription, AdditionalComments, AdditionalParts, Technician, LaborType, LaborPrice, LaborStatus, CompleteDate)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        print("into labor")
+        labor_values = (
+            gun_id,
+            window.received_by_entry.get(),
             window.work_entry.get(),
+            window.add_comment_entry.get(),
             window.add_parts_entry.get(),
-            window.add_comment_entry.get()
-        ))
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        print("labor q")
+        cursor.execute(labor_insert_query, labor_values)
+
+        print("labor c")
+
         conn.commit()
         cursor.close()
         conn.close()
