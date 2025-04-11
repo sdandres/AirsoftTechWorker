@@ -1079,6 +1079,8 @@ def save_changes():
         if 'conn' in locals():
             conn.close()
 
+# Save to PDF
+
 def save_to_pdf():
     # This method generates an HTML file that you can open in your browser
     # and then use the browser's built-in "Print to PDF" feature.
