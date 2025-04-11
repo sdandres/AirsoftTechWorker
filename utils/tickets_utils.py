@@ -1093,7 +1093,7 @@ def save_to_pdf():
             "<html>"
             "<head>"
             "<meta charset='UTF-8'>"
-            "<title>Ticket Information</title>"
+            "<title>Customer Invoice</title>"
             "<style>"
             "  @page { size: letter; margin: 5mm; }"
             "  body { margin: 0; padding: 5mm; font-family: Arial, sans-serif; font-size: 9pt; }"
@@ -1108,7 +1108,7 @@ def save_to_pdf():
         )
         
         # Title
-        html_content += "<h1>Ticket Information</h1>"
+        html_content += "<h1>Customer Invoice</h1>"
         html_content += "<hr>"
         
         # Customer Info
@@ -1191,6 +1191,13 @@ def save_to_pdf():
             "<h2>Customer Information</h2>"
             "<p><strong>Customer Print Name:</strong> _______________________________________</p>"
             "<p><strong>Customer Signature:</strong> _______________________________________</p>"
+        )
+        
+        # Add the logo at the bottom of the invoice.
+        html_content += (
+            "<div style='text-align:center; margin-top:10mm;'>"
+            "<img src='file:///C:/Users/hamza/OneDrive/Desktop/AirsoftTechWorker-ATW-v2.0.0/assets/aalogo_resized.png' alt='Bottom Logo'>"
+            "</div>"
         )
         
         # Close HTML
