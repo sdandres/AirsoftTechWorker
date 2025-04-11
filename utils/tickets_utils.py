@@ -1079,7 +1079,6 @@ def save_changes():
         if 'conn' in locals():
             conn.close()
 
-# Save to HTML
 def save_to_pdf():
     # This method generates an HTML file that you can open in your browser
     # and then use the browser's built-in "Print to PDF" feature.
@@ -1187,13 +1186,21 @@ def save_to_pdf():
             "<br>"
         )
         
+        # Customer Print and Signature Section
+        html_content += (
+            "<h2>Customer Information</h2>"
+            "<p><strong>Customer Print Name:</strong> _______________________________________</p>"
+            "<p><strong>Customer Signature:</strong> _______________________________________</p>"
+        )
+        
+        # Close HTML
         html_content += "</body></html>"
         
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(html_content)
 
         messagebox.showinfo("HTML Saved",
-            "Ticket information saved as HTML.\nOpen it in your browser and use Print → Save as PDF (disable browser headers/footers if needed).")
+            "Ticket information saved as HTML.\nOpen it in your browser and use Print → Save as PDF (disable headers/footers if needed).")
         webbrowser.open(file_path)
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred while saving HTML:\n{e}")
@@ -1201,4 +1208,3 @@ def save_to_pdf():
 def add_save_pdf_button(frame):
     pdf_button = tk.Button(frame, text="Save as HTML (Print to PDF)", command=save_to_pdf)
     pdf_button.pack(side="left", padx=5)
-#End of FIle
