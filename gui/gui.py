@@ -1316,29 +1316,13 @@ def open_onboarding(window):
         height=49.0
     )
 
-    window.canvas.create_text(
-        952.0,
-        612.0,
-        anchor="nw",
-        text="*Required Fields",
-        fill="#E00000",
-        font=("MergeOne Regular", 24 * -1)
-    )
+    
 
     window.canvas.create_text(
         96.0,
         169.0,
         anchor="nw",
         text="First Name*",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        613.0,
-        169.0,
-        anchor="nw",
-        text="Last Name*",
         fill="#000000",
         font=("MergeOne Regular", 24 * -1)
     )
@@ -1356,19 +1340,145 @@ def open_onboarding(window):
         height=45.0
     )
 
-    window.zipcode_entry = Entry(
+    window.canvas.create_text(
+        613.0,
+        169.0,
+        anchor="nw",
+        text="Last Name*",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    
+    
+    window.last_name_entry = Entry(
         bd=0,
         bg="#D9D9D9",
         fg="#000716",
         highlightthickness=0
     )
-    window.zipcode_entry.place(
-        x=767.0,
-        y=538.0,
-        width=272.0,
+    window.last_name_entry.place(
+        x=613.0,
+        y=204.0,
+        width=426.0,
+        height=45.0
+    )
+    
+    window.canvas.create_text(
+        96.0,
+        276.0,
+        anchor="nw",
+        text="Email*",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    window.email_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.email_entry.place(
+        x=96.0,
+        y=310.0,
+        width=426.0,
         height=45.0
     )
 
+    window.canvas.create_text(
+        613.0,
+        276.0,
+        anchor="nw",
+        text="Phone Number*",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    
+    window.phone_number_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.phone_number_entry.place(
+        x=613.0,
+        y=310.0,
+        width=426.0,
+        height=45.0
+    )
+    window.canvas.create_text(
+        96.0,
+        386.0,
+        anchor="nw",
+        text="Address",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    
+    window.address1_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.address1_entry.place(
+        x=97.0,
+        y=424.0,
+        width=426.0,
+        height=45.0
+    )
+    
+    window.canvas.create_text(
+        613.0,
+        386.0,
+        anchor="nw",
+        text="Address 2",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    window.address2_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.address2_entry.place(
+        x=613.0,
+        y=424.0,
+        width=426.0,
+        height=45.0
+    )
+   
+    window.canvas.create_text(
+        97.0,
+        500.0,
+        anchor="nw",
+        text="City",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    window.city_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.city_entry.place(
+        x=97.0,
+        y=538.0,
+        width=426.0,
+        height=45.0
+    )    
+
+
+
+    window.canvas.create_text(
+        613.0,
+        500.0,
+        anchor="nw",
+        text="State",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
     window.state_combobox = ttk.Combobox(
         window,
         values=states
@@ -1391,144 +1501,33 @@ def open_onboarding(window):
 
     window.state_combobox.bind('<KeyRelease>', autocomplete)
 
-    window.city_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.city_entry.place(
-        x=97.0,
-        y=538.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.address2_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.address2_entry.place(
-        x=613.0,
-        y=424.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.address1_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.address1_entry.place(
-        x=97.0,
-        y=424.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.phone_number_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.phone_number_entry.place(
-        x=613.0,
-        y=310.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.last_name_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.last_name_entry.place(
-        x=613.0,
-        y=204.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.email_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.email_entry.place(
-        x=96.0,
-        y=310.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.canvas.create_text(
-        96.0,
-        276.0,
-        anchor="nw",
-        text="Email*",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        96.0,
-        386.0,
-        anchor="nw",
-        text="Address",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        97.0,
-        500.0,
-        anchor="nw",
-        text="City",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        613.0,
-        276.0,
-        anchor="nw",
-        text="Mobile*",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        613.0,
-        386.0,
-        anchor="nw",
-        text="Address 2",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        613.0,
-        500.0,
-        anchor="nw",
-        text="State",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
+    
     window.canvas.create_text(
         767.0,
         500.0,
         anchor="nw",
         text="Zipcode",
         fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    window.zipcode_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.zipcode_entry.place(
+        x=767.0,
+        y=538.0,
+        width=272.0,
+        height=45.0
+    )
+    window.canvas.create_text(
+        952.0,
+        612.0,
+        anchor="nw",
+        text="*Required Fields",
+        fill="#E00000",
         font=("MergeOne Regular", 24 * -1)
     )
     window.resizable(False, False)
