@@ -27,6 +27,7 @@ def get_database_conn_str() -> str:
     return (
         r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
         f'DBQ={db_path};'
+        'PWD=americairsoft;'
     )
 
 
