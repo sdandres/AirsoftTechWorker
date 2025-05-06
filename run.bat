@@ -1,5 +1,4 @@
 @echo off
-REM === RUN APP ===
+REM === RUN APP HIDDEN ===
 call venv\Scripts\activate.bat
-python main.py
-pause
+start "" pythonw.exe main.pyw
