@@ -41,6 +41,8 @@ def open_ticket_editor(ticket_data, refresh_callback=None):
     build_sections(frame)
     populate_fields(ticket_data)
     bind_total_events()
+    update_totals()
+    update_totals()
 
     def on_close():
             if refresh_callback:
@@ -89,6 +91,9 @@ def build_label_entry(frame, label):
         entry.insert(0, "")
         entry.config(state="readonly", disabledbackground="#f0f0f0")
 
+    if label in ["Labor Price"]:
+        entry.config(validate="key", validatecommand=(row.register(validate_numeric_input), "%P"))
+
     entry.pack(side="left")
     ticket_ui_elements["entries"][label] = entry
 
@@ -104,6 +109,16 @@ def bind_total_events():
     ticket_ui_elements["dropdowns"]["Labor Type"].bind("<<ComboboxSelected>>", lambda e: update_labor_price())
     for field in ["Purchase Date", "DropOff Date", "Finish Date", "PickUp Date"]:
         ticket_ui_elements["entries"][field].bind("<KeyRelease>", lambda e, entry=ticket_ui_elements["entries"][field]: format_and_validate_date(e, entry))
+
+# ---------- Numeric Field Formatter ----------
+def validate_numeric_input(new_value):
+    if new_value == "":
+        return True
+    try:
+        float(new_value)
+        return True
+    except ValueError:
+        return False
 
     
 def build_sections(frame):
@@ -157,16 +172,6 @@ def build_sections(frame):
     build_dropdown(labor_row, "Labor Type", ["Did not specify", "External", "Internal", "External & Internal", "Advanced", "Connector Swap", "Custom"])
     build_label_entry(labor_row, "Labor Price")
 
-    # ---------- Numeric Field Formatter ----------
-    def validate_numeric_input(new_value):
-        if new_value == "":
-            return True
-        try:
-            float(new_value)
-            return True
-        except ValueError:
-            return False
-
     # Parts Table
     parts_frame = tk.LabelFrame(right_col, text="Parts List")
     parts_frame.pack(padx=10, pady=5, anchor="nw")
@@ -174,7 +179,6 @@ def build_sections(frame):
     entry_row = tk.Frame(parts_frame)
     entry_row.pack(anchor="w", pady=5)
 
-    
     vcmd = (parts_frame.register(validate_numeric_input), "%P")
 
     tk.Label(entry_row, text="Part Name").grid(row=0, column=0, padx=5)
@@ -217,7 +221,6 @@ def build_sections(frame):
     build_parts_table(parts_frame)
     tk.Button(parts_frame, text="Delete Selected Part", command=delete_selected_part).pack(pady=5)
 
-
     # Totals Section
     totals_frame = tk.LabelFrame(right_col, text="Totals")
     totals_frame.pack(padx=10, pady=5, anchor="nw")
@@ -235,7 +238,6 @@ def build_sections(frame):
 
     ticket_ui_elements["labels"]["total"] = tk.Label(totals_frame, text="Total: $0.00", font=("Arial", 10, "bold"))
     ticket_ui_elements["labels"]["total"].pack(anchor="w", pady=(5, 0))
-
 
     # Dates & Status Section
     dates_frame = tk.LabelFrame(right_col, text="Current Status & Dates")
@@ -424,6 +426,7 @@ def populate_parts_table():
     tree = ticket_ui_elements["tree"]
     for part in current_parts:
         tree.insert("", "end", values=(part["PartName"], part["PartQuantity"], f"${part['PartPrice']:.2f}"))
+    update_totals()
 
 def delete_selected_part():
     tree = ticket_ui_elements["tree"]
