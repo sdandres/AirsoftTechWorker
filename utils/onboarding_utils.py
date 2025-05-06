@@ -40,7 +40,8 @@ def validate_data(window):
 
     # Mobile
     phone_number = window.phone_number_entry.get().strip()
-    phone_digits = phone_number.replace('-', '')
+    phone_digits = re.sub(r'\D', '', phone_number)
+    
     if not phone_digits.isdigit() or len(phone_digits) != 10:
         messagebox.showerror("Invalid Input", "Please enter a valid 10-digit phone number (dashes are allowed).")
         return False

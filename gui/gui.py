@@ -773,47 +773,6 @@ def open_new_ticket(window):
         height=100.0
     )
 
-    window.clear_button_image = PhotoImage(
-        file=relative_to_assets("clear_button.png"))
-    window.clear_button = Button(
-        image=window.clear_button_image,
-        borderwidth=0,
-        highlightthickness=0,
-        command=lambda: print("button_7 clicked"),
-        relief="flat"
-    )
-    window.clear_button.place(
-        x=1024.0,
-        y=719.0,
-        width=78.0,
-        height=49.0
-    )
-
-    window.save_button_image = PhotoImage(
-        file=relative_to_assets("save_button.png"))
-    window.save_button = Button(
-        image=window.save_button_image,
-        borderwidth=0,
-        highlightthickness=0,
-        command=lambda: nt.save_to_access(window),
-        relief="flat"
-    )
-    window.save_button.place(
-        x=913.0,
-        y=719.0,
-        width=78.0,
-        height=49.0
-    )
-
-    window.canvas.create_text(
-        902.0,
-        680.0,
-        anchor="nw",
-        text="*Required Fields",
-        fill="#E00000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
     window.drop_off_date_entry = Entry(
         bd=0,
         bg="#D9D9D9",
@@ -833,150 +792,6 @@ def open_new_ticket(window):
         '<KeyRelease>',
         lambda event: format_and_validate_date(event, date_entry=window.drop_off_date_entry)
     )
-
-    window.purchase_location_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.purchase_location_entry.place(
-        x=36.0,
-        y=333.0,
-        width=264.0,
-        height=45.0
-    )
-
-    window.past_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.past_entry.place(
-        x=36.0,
-        y=439.0,
-        width=494.0,
-        height=69.0
-    )
-
-    window.work_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.work_entry.place(
-        x=36.0,
-        y=563.0,
-        width=494.0,
-        height=149.0
-    )
-
-    window.add_parts_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.add_parts_entry.place(
-        x=602.0,
-        y=388.0,
-        width=500.0,
-        height=69.0
-    )
-
-    window.add_comment_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.add_comment_entry.place(
-        x=602.0,
-        y=512.0,
-        width=500.0,
-        height=142.0
-    )
-
-    window.purchase_date_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.purchase_date_entry.place(
-        x=382.0,
-        y=333.0,
-        width=160.0,
-        height=45.0
-    )
-
-    window.purchase_date_entry.bind(
-        '<KeyRelease>',
-        lambda event: format_and_validate_date(event, date_entry=window.purchase_date_entry)
-    )
-
-    window.gun_serial_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.gun_serial_entry.place(
-        x=802.0,
-        y=244.0,
-        width=300.0,
-        height=45.0
-    )
-
-    window.gun_brand_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.gun_brand_entry.place(
-        x=36.0,
-        y=244.0,
-        width=192.0,
-        height=45.0
-    )
-
-    window.gun_brand_combobox = ttk.Combobox(
-        window,
-        values=brands
-    )
-    window.gun_brand_combobox.place(
-        x=36.0,
-        y=244.0,
-        width=192.0,
-        height=45.0
-    )
-
-    def autocomplete(event):
-        entered_text = event.widget.get()
-        if entered_text:
-            matches = [state for state in brands if state.lower().startswith(entered_text.lower())]
-            window.gun_brand_combobox['values'] = matches
-        else:
-            window.gun_brand_combobox['values'] = brands
-
-    window.gun_brand_combobox.bind('<KeyRelease>', autocomplete)
-
-    window.gun_model_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.gun_model_entry.place(
-        x=300.0,
-        y=244.0,
-        width=430.0,
-        height=45.0
-    )
-
     window.customer_entry = Entry(
         bd=0,
         bg="#D9D9D9",
@@ -1049,11 +864,196 @@ def open_new_ticket(window):
         fg="#000716",
         highlightthickness=0
     )
+
     window.received_by_entry.place(
         x=845.0,
         y=155.0,
         width=255.0,
         height=45.0
+    )
+
+    window.gun_brand_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.gun_brand_entry.place(
+        x=36.0,
+        y=244.0,
+        width=192.0,
+        height=45.0
+    )
+
+    window.gun_brand_combobox = ttk.Combobox(
+        window,
+        values=brands
+    )
+    window.gun_brand_combobox.place(
+        x=36.0,
+        y=244.0,
+        width=192.0,
+        height=45.0
+    )
+
+    def autocomplete(event):
+        entered_text = event.widget.get()
+        if entered_text:
+            matches = [state for state in brands if state.lower().startswith(entered_text.lower())]
+            window.gun_brand_combobox['values'] = matches
+        else:
+            window.gun_brand_combobox['values'] = brands
+
+    window.gun_brand_combobox.bind('<KeyRelease>', autocomplete)
+
+    window.gun_model_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.gun_model_entry.place(
+        x=300.0,
+        y=244.0,
+        width=430.0,
+        height=45.0
+    )    
+
+    window.gun_serial_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.gun_serial_entry.place(
+        x=802.0,
+        y=244.0,
+        width=300.0,
+        height=45.0
+    )
+
+    window.purchase_location_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.purchase_location_entry.place(
+        x=36.0,
+        y=333.0,
+        width=264.0,
+        height=45.0
+    )
+
+    window.purchase_date_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.purchase_date_entry.place(
+        x=382.0,
+        y=333.0,
+        width=160.0,
+        height=45.0
+    )
+
+    window.purchase_date_entry.bind(
+        '<KeyRelease>',
+        lambda event: format_and_validate_date(event, date_entry=window.purchase_date_entry)
+    )
+
+    window.past_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.past_entry.place(
+        x=36.0,
+        y=439.0,
+        width=494.0,
+        height=69.0
+    )
+
+    window.add_parts_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.add_parts_entry.place(
+        x=602.0,
+        y=388.0,
+        width=500.0,
+        height=69.0
+    )
+
+    window.work_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.work_entry.place(
+        x=36.0,
+        y=563.0,
+        width=494.0,
+        height=149.0
+    )
+
+    window.add_comment_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.add_comment_entry.place(
+        x=602.0,
+        y=512.0,
+        width=500.0,
+        height=142.0
+    )
+
+    window.save_button_image = PhotoImage(
+        file=relative_to_assets("save_button.png"))
+    window.save_button = Button(
+        image=window.save_button_image,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: nt.save_to_access(window),
+        relief="flat"
+    )
+    window.save_button.place(
+        x=913.0,
+        y=719.0,
+        width=78.0,
+        height=49.0
+    )
+    window.clear_button_image = PhotoImage(
+        file=relative_to_assets("clear_button.png"))
+    window.clear_button = Button(
+        image=window.clear_button_image,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: print("button_7 clicked"),
+        relief="flat"
+    )
+
+    window.clear_button.place(
+        x=1024.0,
+        y=719.0,
+        width=78.0,
+        height=49.0
+    )
+
+    window.canvas.create_text(
+        902.0,
+        680.0,
+        anchor="nw",
+        text="*Required Fields",
+        fill="#E00000",
+        font=("MergeOne Regular", 24 * -1)
     )
 
     window.canvas.create_text(
@@ -1316,29 +1316,13 @@ def open_onboarding(window):
         height=49.0
     )
 
-    window.canvas.create_text(
-        952.0,
-        612.0,
-        anchor="nw",
-        text="*Required Fields",
-        fill="#E00000",
-        font=("MergeOne Regular", 24 * -1)
-    )
+    
 
     window.canvas.create_text(
         96.0,
         169.0,
         anchor="nw",
         text="First Name*",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        613.0,
-        169.0,
-        anchor="nw",
-        text="Last Name*",
         fill="#000000",
         font=("MergeOne Regular", 24 * -1)
     )
@@ -1356,19 +1340,145 @@ def open_onboarding(window):
         height=45.0
     )
 
-    window.zipcode_entry = Entry(
+    window.canvas.create_text(
+        613.0,
+        169.0,
+        anchor="nw",
+        text="Last Name*",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    
+    
+    window.last_name_entry = Entry(
         bd=0,
         bg="#D9D9D9",
         fg="#000716",
         highlightthickness=0
     )
-    window.zipcode_entry.place(
-        x=767.0,
-        y=538.0,
-        width=272.0,
+    window.last_name_entry.place(
+        x=613.0,
+        y=204.0,
+        width=426.0,
+        height=45.0
+    )
+    
+    window.canvas.create_text(
+        96.0,
+        276.0,
+        anchor="nw",
+        text="Email*",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    window.email_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.email_entry.place(
+        x=96.0,
+        y=310.0,
+        width=426.0,
         height=45.0
     )
 
+    window.canvas.create_text(
+        613.0,
+        276.0,
+        anchor="nw",
+        text="Phone Number*",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    
+    window.phone_number_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.phone_number_entry.place(
+        x=613.0,
+        y=310.0,
+        width=426.0,
+        height=45.0
+    )
+    window.canvas.create_text(
+        96.0,
+        386.0,
+        anchor="nw",
+        text="Address",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    
+    window.address1_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.address1_entry.place(
+        x=97.0,
+        y=424.0,
+        width=426.0,
+        height=45.0
+    )
+    
+    window.canvas.create_text(
+        613.0,
+        386.0,
+        anchor="nw",
+        text="Address 2",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    window.address2_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.address2_entry.place(
+        x=613.0,
+        y=424.0,
+        width=426.0,
+        height=45.0
+    )
+   
+    window.canvas.create_text(
+        97.0,
+        500.0,
+        anchor="nw",
+        text="City",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    window.city_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.city_entry.place(
+        x=97.0,
+        y=538.0,
+        width=426.0,
+        height=45.0
+    )    
+
+
+
+    window.canvas.create_text(
+        613.0,
+        500.0,
+        anchor="nw",
+        text="State",
+        fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
     window.state_combobox = ttk.Combobox(
         window,
         values=states
@@ -1391,144 +1501,33 @@ def open_onboarding(window):
 
     window.state_combobox.bind('<KeyRelease>', autocomplete)
 
-    window.city_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.city_entry.place(
-        x=97.0,
-        y=538.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.address2_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.address2_entry.place(
-        x=613.0,
-        y=424.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.address1_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.address1_entry.place(
-        x=97.0,
-        y=424.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.phone_number_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.phone_number_entry.place(
-        x=613.0,
-        y=310.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.last_name_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.last_name_entry.place(
-        x=613.0,
-        y=204.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.email_entry = Entry(
-        bd=0,
-        bg="#D9D9D9",
-        fg="#000716",
-        highlightthickness=0
-    )
-    window.email_entry.place(
-        x=96.0,
-        y=310.0,
-        width=426.0,
-        height=45.0
-    )
-
-    window.canvas.create_text(
-        96.0,
-        276.0,
-        anchor="nw",
-        text="Email*",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        96.0,
-        386.0,
-        anchor="nw",
-        text="Address",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        97.0,
-        500.0,
-        anchor="nw",
-        text="City",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        613.0,
-        276.0,
-        anchor="nw",
-        text="Mobile*",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        613.0,
-        386.0,
-        anchor="nw",
-        text="Address 2",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
-    window.canvas.create_text(
-        613.0,
-        500.0,
-        anchor="nw",
-        text="State",
-        fill="#000000",
-        font=("MergeOne Regular", 24 * -1)
-    )
-
+    
     window.canvas.create_text(
         767.0,
         500.0,
         anchor="nw",
         text="Zipcode",
         fill="#000000",
+        font=("MergeOne Regular", 24 * -1)
+    )
+    window.zipcode_entry = Entry(
+        bd=0,
+        bg="#D9D9D9",
+        fg="#000716",
+        highlightthickness=0
+    )
+    window.zipcode_entry.place(
+        x=767.0,
+        y=538.0,
+        width=272.0,
+        height=45.0
+    )
+    window.canvas.create_text(
+        952.0,
+        612.0,
+        anchor="nw",
+        text="*Required Fields",
+        fill="#E00000",
         font=("MergeOne Regular", 24 * -1)
     )
     window.resizable(False, False)
