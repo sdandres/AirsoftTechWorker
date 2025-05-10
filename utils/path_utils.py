@@ -20,16 +20,28 @@ def get_assets_path() -> Path:
     """
     return resource_path("assets")
 
+import shutil
+
 def get_database_conn_str() -> str:
-    db_path = resource_path("database/AmericaAirsoftDataBase.accdb")
-    print(f"Using DB path: {db_path}")  # DEBUG
+    # Original bundled path (read-only in PyInstaller)
+    source_path = resource_path("database/AmericaAirsoftDataBase.accdb")
+
+    # Writable copy path (current working directory)
+    target_path = Path.cwd() / "AmericaAirsoftDataBase_runtime.accdb"
+
+    # Copy once if it doesn't already exist
+    if not target_path.exists():
+        try:
+            shutil.copy2(source_path, target_path)
+            print(f"Copied DB to {target_path}")
+        except Exception as e:
+            print(f"Failed to copy database: {e}")
 
     return (
         r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
-        f'DBQ={db_path};'
+        f'DBQ={target_path};'
         'PWD=americairsoft;'
     )
-
 
 def relative_to_assets(path: str) -> Path:
     """
