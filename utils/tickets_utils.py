@@ -689,9 +689,9 @@ def generate_invoice_html():
     <div class="header-wrap">
         <div class="left-box">
             <strong>America Airsoft</strong><br>
-            12401 Folsom Blvd Suite 109<br>
-            Rancho Cordova, CA 95742<br>
-            Located inside Nimbus Winery<br>
+            12395 Stockton Blvd<br>
+            Galt, CA 95632<br>
+            Located in All Patriot Airsoft Field<br>
             (916) 790 - 8376
         </div>
         <div>
@@ -870,4 +870,5 @@ def generate_ticket_html():
     </body>
     </html>
     """
+
     return html
